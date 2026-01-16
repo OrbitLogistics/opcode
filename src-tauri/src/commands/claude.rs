@@ -136,11 +136,13 @@ fn find_claude_binary(app_handle: &AppHandle) -> Result<String, String> {
 
 /// Gets the path to the ~/.claude directory
 fn get_claude_dir() -> Result<PathBuf> {
-    dirs::home_dir()
+    let claude_path = dirs::home_dir()
         .context("Could not find home directory")?
-        .join(".claude")
-        .canonicalize()
-        .context("Could not find ~/.claude directory")
+        .join(".claude");
+
+    // Try to canonicalize, but if it fails (e.g., on Windows with certain path configurations),
+    // just use the path as-is
+    Ok(claude_path.canonicalize().unwrap_or(claude_path))
 }
 
 /// Gets the actual project path by reading the cwd from the JSONL entries

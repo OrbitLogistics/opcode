@@ -277,11 +277,16 @@ pub async fn storage_update_row(
     }
 
     // Execute update
-    conn.execute(
+    let rows_affected = conn.execute(
         &query,
         rusqlite::params_from_iter(params.iter().map(|p| p.as_ref())),
     )
     .map_err(|e| format!("Failed to update row: {}", e))?;
+
+    // If no rows were affected, the row doesn't exist
+    if rows_affected == 0 {
+        return Err("No rows were updated - row does not exist".to_string());
+    }
 
     Ok(())
 }

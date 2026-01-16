@@ -218,7 +218,8 @@ export const Settings: React.FC<SettingsProps> = ({
       setSettings(updatedSettings);
 
       // Save Claude binary path if changed
-      if (binaryPathChanged && selectedInstallation) {
+      // Only save if it's an actual file path (contains path separators), not just a command name
+      if (binaryPathChanged && selectedInstallation && (selectedInstallation.path.includes('/') || selectedInstallation.path.includes('\\'))) {
         await api.setClaudeBinaryPath(selectedInstallation.path);
         setCurrentBinaryPath(selectedInstallation.path);
         setBinaryPathChanged(false);
